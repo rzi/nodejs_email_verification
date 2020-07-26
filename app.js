@@ -16,21 +16,41 @@ app.set('views', 'views');
 
 
 // email connection
-
+// var transporter = nodemailer.createTransport({
+//     service: 'smtp.mailtrap.io',
+//     secure: true,
+//     port: 465,
+//     auth:{
+//         user:'8a709cdabf15c3',
+//         pass:'c37bd1a0eb74ec'
+//     },
+//     debug: true, // show debug output
+//     logger: true // log information in console
+// });
 var transporter = nodemailer.createTransport({
-    service: 'gmail',
-    auth:{
-        user:'thecoderank@gmail.com',
-        pass:'thecoderank2018'
-    }
-});
+    host: "smtp.mailtrap.io",
+    port: 2525,
+    auth: {
+      user: "8a709cdabf15c3",
+      pass: "c37bd1a0eb74ec"
+    },
+    debug: true, // show debug output
+    logger: true // log information in console
+  });
 
+  transporter.verify(function(error, success) {
+    if (error) {
+         console.log(error);
+    } else {
+         console.log('Server is ready to take our messages');
+    }
+ });
 // database connection for storing data
 const connection = mysql.createConnection({
-    host: 'localhost',
-    user: 'root',
-    password: '',
-    database: 'emailverify'
+    host: 'pi.cba.pl',
+    user: 'Bazapi2019',
+    password: 'Bazapi2019',
+    database: 'elunch_1'
 });
 
 // cookie parser
@@ -38,14 +58,9 @@ app.use(cookieParser());
 
 connection.connect();
 
-
-
-
 app.get('/', (req, res) => {
     res.render('index');
 });
-
-
 
 // this is for registration
 app.post('/', (req, res) => {
@@ -55,12 +70,11 @@ app.post('/', (req, res) => {
         var verify = Math.floor((Math.random() * 10000000) + 1);
 
         var mailOption = {
-            from :'thecoderank@gmail.com', // sender this is your email here
+            from :'0b6878af14-ced15a@inbox.mailtrap.io', // sender this is your email here
             to : `${req.body.Email}`, // receiver email2
             subject: "Account Verification",
-            html: `<h1>Hello Friend Please Click on this link<h1><br><hr><p>HELLO I AM 
-        THECODERANK I MAKE THIS TUTORIAL FOR MY SUBSCRIBERS AND OUR FRIENDS.</p>
-        <br><a href="http://localhost:3000/verification/?verify=${verify}">CLICK ME TO ACTIVATE YOUR ACCOUNT</a>`
+            html: `<h1>Cześć, kliknij na link <h1><br><hr><p> Link aktywacyjny.</p>
+        <br><a href="http://localhost:3000/verification/?verify=${verify}">Kliknij aby aktywować twoje konto</a>`
         }
         // store data 
 
@@ -79,8 +93,10 @@ app.post('/', (req, res) => {
                         }
                         res.cookie("UserInfo",userdata);
                         res.send("Your Mail Send Successfully")
+                        console.log ('Your Mail Send Successfully')
                     }
                 })
+                
                 console.log('Data Successfully insert')
             }
         })
@@ -124,13 +140,13 @@ app.get('/verification/',(req,res)=>{
             console.log(err);
         }else{
             activateAccount(result[0].verification);
-            /* var verify1 = req.query.verify;
+             var verify1 = req.query.verify;
             var verify2 = result[0].verification; 
             if(verify1 == verify2) {
                 activateAccount(result[0].verification);
             }else{
                 res.send("<h1>verification fail</h1>")
-            } */
+            } 
         }
     })
 });
